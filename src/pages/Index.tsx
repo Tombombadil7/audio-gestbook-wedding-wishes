@@ -4,7 +4,7 @@ import { Upload, Download, FileText, Music, Heart, Gift } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import PdfUploader from '@/components/PdfUploader';
+import PdfViewer from '@/components/PdfViewer';
 import AudioConverter from '@/components/AudioConverter';
 
 const Index = () => {
@@ -49,11 +49,11 @@ const Index = () => {
                 הוראות הרכבה
               </CardTitle>
               <CardDescription className="text-gray-600" dir="rtl">
-                העלו, צפו והורידו את הוראות ההרכבה של ספר האורחים האודיו
+                צפו והורידו את הוראות ההרכבה המפורטות של ספר האורחים האודיו
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <PdfUploader />
+              <PdfViewer />
             </CardContent>
           </Card>
 
@@ -90,7 +90,7 @@ const Index = () => {
                 <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
                   <span className="text-xl font-bold text-blue-600">1</span>
                 </div>
-                <h3 className="font-semibold text-gray-800" dir="rtl">הורידו את ההוראות</h3>
+                <h3 className="font-semibold text-gray-800" dir="rtl">צפו בהוראות</h3>
                 <p className="text-sm text-gray-600" dir="rtl">צפו בהוראות ההרכבה והורידו את קובץ ה-PDF</p>
               </div>
               <div className="space-y-3">
