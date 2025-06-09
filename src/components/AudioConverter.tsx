@@ -1,9 +1,11 @@
 
 import React, { useState } from 'react';
-import { Upload, Download, Music, Loader2, CheckCircle, X } from 'lucide-react';
+import { Upload, Download, Music, Loader2, CheckCircle, X, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface ConvertedFile {
   originalName: string;
@@ -16,6 +18,8 @@ const AudioConverter = () => {
   const [isConverting, setIsConverting] = useState(false);
   const [convertedFile, setConvertedFile] = useState<ConvertedFile | null>(null);
   const [progress, setProgress] = useState(0);
+  const [apiKey, setApiKey] = useState('');
+  const [showApiKeyInput, setShowApiKeyInput] = useState(false);
   const { toast } = useToast();
 
   const acceptedFormats = [
@@ -27,6 +31,121 @@ const AudioConverter = () => {
     'audio/aac',
     'audio/flac'
   ];
+
+  // Browser-compatible version of your CloudConvert function
+  const convertAudioTo44kHzWav = async (inputFile: File, fileName: string): Promise<Blob | null> => {
+    const storedApiKey = apiKey || localStorage.getItem('cloudconvert_api_key');
+    
+    if (!storedApiKey) {
+      toast({
+        title: "חסר מפתח API",
+        description: "אנא הזינו מפתח API של CloudConvert",
+        variant: "destructive",
+      });
+      setShowApiKeyInput(true);
+      return null;
+    }
+
+    try {
+      // Create a job with upload, conversion, and export tasks
+      const jobResponse = await fetch('https://api.cloudconvert.com/v2/jobs', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${storedApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tasks: {
+            'import-my-file': {
+              operation: 'import/upload',
+            },
+            'convert-my-file': {
+              operation: 'convert',
+              input: 'import-my-file',
+              output_format: 'wav',
+              audio_sample_rate: 44100,
+            },
+            'export-my-file': {
+              operation: 'export/url',
+              input: 'convert-my-file',
+              filename: 'greeting.wav',
+            },
+          },
+        }),
+      });
+
+      if (!jobResponse.ok) {
+        throw new Error(`API Error: ${jobResponse.status}`);
+      }
+
+      const job = await jobResponse.json();
+      setProgress(10);
+
+      // Upload the file
+      const importTask = job.data.tasks.find((t: any) => t.operation === 'import/upload');
+      const formData = new FormData();
+      formData.append('file', inputFile, fileName);
+
+      const uploadResponse = await fetch(importTask.result.form.url, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error('Failed to upload file');
+      }
+      setProgress(30);
+
+      // Wait for the job to finish
+      let finishedJob;
+      let attempts = 0;
+      const maxAttempts = 30; // 30 seconds timeout
+
+      while (attempts < maxAttempts) {
+        const statusResponse = await fetch(`https://api.cloudconvert.com/v2/jobs/${job.data.id}`, {
+          headers: {
+            'Authorization': `Bearer ${storedApiKey}`,
+          },
+        });
+
+        finishedJob = await statusResponse.json();
+        
+        if (finishedJob.data.status === 'finished') {
+          break;
+        } else if (finishedJob.data.status === 'error') {
+          throw new Error('Conversion failed');
+        }
+
+        setProgress(30 + (attempts / maxAttempts) * 60);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        attempts++;
+      }
+
+      if (attempts >= maxAttempts) {
+        throw new Error('Conversion timeout');
+      }
+
+      setProgress(90);
+
+      // Get the export URL and download the file
+      const exportTask = finishedJob.data.tasks.find((t: any) => t.operation === 'export/url');
+      const downloadUrl = exportTask.result.files[0].url;
+
+      const downloadResponse = await fetch(downloadUrl);
+      if (!downloadResponse.ok) throw new Error('Failed to download converted file');
+
+      setProgress(100);
+      return await downloadResponse.blob();
+    } catch (error) {
+      console.error('Error converting audio:', error);
+      toast({
+        title: "שגיאה בהמרה",
+        description: `נכשלה המרת הקובץ: ${error instanceof Error ? error.message : 'שגיאה לא ידועה'}`,
+        variant: "destructive",
+      });
+      return null;
+    }
+  };
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -45,31 +164,15 @@ const AudioConverter = () => {
     setConvertedFile(null);
   };
 
-  const simulateConversion = async () => {
+  const handleConversion = async () => {
+    if (!selectedFile) return;
+
     setIsConverting(true);
     setProgress(0);
 
-    // Simulate conversion progress
-    const progressInterval = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 90) {
-          clearInterval(progressInterval);
-          return 90;
-        }
-        return prev + Math.random() * 15;
-      });
-    }, 200);
-
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    const convertedBlob = await convertAudioTo44kHzWav(selectedFile, selectedFile.name);
     
-    clearInterval(progressInterval);
-    setProgress(100);
-
-    // In a real implementation, you would call your audio conversion API here
-    // For now, we'll simulate by creating a fake converted file
-    if (selectedFile) {
-      const convertedBlob = new Blob([selectedFile], { type: 'audio/wav' });
+    if (convertedBlob) {
       const downloadUrl = URL.createObjectURL(convertedBlob);
       
       setConvertedFile({
@@ -77,13 +180,14 @@ const AudioConverter = () => {
         convertedBlob,
         downloadUrl
       });
+
+      toast({
+        title: "ההמירה הושלמה!",
+        description: "קובץ האודיו הומר בהצלחה לפורמט WAV 44.1kHz",
+      });
     }
 
     setIsConverting(false);
-    toast({
-      title: "ההמירה הושלמה!",
-      description: "קובץ האודיו הומר בהצלחה לפורמט WAV 44.1kHz",
-    });
   };
 
   const handleDownload = () => {
@@ -111,8 +215,55 @@ const AudioConverter = () => {
     }
   };
 
+  const handleApiKeySave = () => {
+    localStorage.setItem('cloudconvert_api_key', apiKey);
+    setShowApiKeyInput(false);
+    toast({
+      title: "מפתח API נשמר",
+      description: "המפתח נשמר במחשב שלכם",
+    });
+  };
+
   return (
     <div className="space-y-4">
+      {/* API Key Configuration */}
+      <div className="flex justify-end">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setShowApiKeyInput(!showApiKeyInput)}
+          className="text-gray-500"
+        >
+          <Settings className="w-4 h-4 mr-2" />
+          <span dir="rtl">הגדרת API</span>
+        </Button>
+      </div>
+
+      {showApiKeyInput && (
+        <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+          <Label htmlFor="api-key" dir="rtl">מפתח API של CloudConvert</Label>
+          <Input
+            id="api-key"
+            type="password"
+            placeholder="sk-..."
+            value={apiKey}
+            onChange={(e) => setApiKey(e.target.value)}
+            dir="ltr"
+          />
+          <div className="flex space-x-2">
+            <Button onClick={handleApiKeySave} size="sm">
+              <span dir="rtl">שמירה</span>
+            </Button>
+            <Button variant="ghost" onClick={() => setShowApiKeyInput(false)} size="sm">
+              <span dir="rtl">ביטול</span>
+            </Button>
+          </div>
+          <p className="text-xs text-gray-600" dir="rtl">
+            המפתח נשמר במחשב שלכם בלבד ולא נשלח לשרת
+          </p>
+        </div>
+      )}
+
       {!selectedFile ? (
         <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-purple-400 transition-colors">
           <input
@@ -184,7 +335,7 @@ const AudioConverter = () => {
               </div>
             ) : (
               <Button 
-                onClick={simulateConversion} 
+                onClick={handleConversion} 
                 disabled={isConverting}
                 className="w-full"
               >
