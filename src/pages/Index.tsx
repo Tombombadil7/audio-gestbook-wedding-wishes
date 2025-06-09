@@ -30,7 +30,7 @@ const Index = () => {
             ברוכים הבאים למתנת החתונה שלכם
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto" dir="rtl">
-            ספר אורחים אודיו דיגיטלי מיוחד שנוצר במיוחד עבורכם
+            ספר ברכות אודיו שהאורחים שלכם יכולים להקליט בחתונה במיוחד בשבילכם
           </p>
         </div>
       </div>
@@ -46,10 +46,10 @@ const Index = () => {
                 <FileText className="w-12 h-12 text-blue-500" />
               </div>
               <CardTitle className="text-2xl text-gray-800" dir="rtl">
-                הוראות הרכבה
+                הוראות שימוש
               </CardTitle>
               <CardDescription className="text-gray-600" dir="rtl">
-                צפו והורידו את הוראות ההרכבה המפורטות של ספר האורחים האודיו
+                צפו והורידו את הוראות השימוש המפורטות של המתנה שלכם
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -67,7 +67,7 @@ const Index = () => {
                 ממיר קבצי אודיו
               </CardTitle>
               <CardDescription className="text-gray-600" dir="rtl">
-                המירו קבצי אודיו לפורמט WAV 44.1kHz הנדרש לפרויקט
+                המירו קבצי אודיו לפורמט WAV 44.1kHz הנדרש לברכה שהאורחים ישמעו
               </CardDescription>
             </CardHeader>
             <CardContent>
