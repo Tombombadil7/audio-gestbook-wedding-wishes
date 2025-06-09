@@ -1,11 +1,9 @@
 
 import React, { useState } from 'react';
-import { Upload, Download, Music, Loader2, CheckCircle, X, Settings } from 'lucide-react';
+import { Upload, Download, Music, Loader2, CheckCircle, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 
 interface ConvertedFile {
   originalName: string;
@@ -13,13 +11,14 @@ interface ConvertedFile {
   downloadUrl: string;
 }
 
+// Set your CloudConvert API key here
+const CLOUDCONVERT_API_KEY = 'YOUR_API_KEY_HERE';
+
 const AudioConverter = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isConverting, setIsConverting] = useState(false);
   const [convertedFile, setConvertedFile] = useState<ConvertedFile | null>(null);
   const [progress, setProgress] = useState(0);
-  const [apiKey, setApiKey] = useState('');
-  const [showApiKeyInput, setShowApiKeyInput] = useState(false);
   const { toast } = useToast();
 
   const acceptedFormats = [
@@ -34,15 +33,12 @@ const AudioConverter = () => {
 
   // Browser-compatible version of your CloudConvert function
   const convertAudioTo44kHzWav = async (inputFile: File, fileName: string): Promise<Blob | null> => {
-    const storedApiKey = apiKey || localStorage.getItem('cloudconvert_api_key');
-    
-    if (!storedApiKey) {
+    if (!CLOUDCONVERT_API_KEY || CLOUDCONVERT_API_KEY === 'YOUR_API_KEY_HERE') {
       toast({
         title: "חסר מפתח API",
-        description: "אנא הזינו מפתח API של CloudConvert",
+        description: "אנא הגדירו מפתח API של CloudConvert בקוד",
         variant: "destructive",
       });
-      setShowApiKeyInput(true);
       return null;
     }
 
@@ -51,7 +47,7 @@ const AudioConverter = () => {
       const jobResponse = await fetch('https://api.cloudconvert.com/v2/jobs', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${storedApiKey}`,
+          'Authorization': `Bearer ${CLOUDCONVERT_API_KEY}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -104,7 +100,7 @@ const AudioConverter = () => {
       while (attempts < maxAttempts) {
         const statusResponse = await fetch(`https://api.cloudconvert.com/v2/jobs/${job.data.id}`, {
           headers: {
-            'Authorization': `Bearer ${storedApiKey}`,
+            'Authorization': `Bearer ${CLOUDCONVERT_API_KEY}`,
           },
         });
 
@@ -215,55 +211,8 @@ const AudioConverter = () => {
     }
   };
 
-  const handleApiKeySave = () => {
-    localStorage.setItem('cloudconvert_api_key', apiKey);
-    setShowApiKeyInput(false);
-    toast({
-      title: "מפתח API נשמר",
-      description: "המפתח נשמר במחשב שלכם",
-    });
-  };
-
   return (
     <div className="space-y-4">
-      {/* API Key Configuration */}
-      <div className="flex justify-end">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setShowApiKeyInput(!showApiKeyInput)}
-          className="text-gray-500"
-        >
-          <Settings className="w-4 h-4 mr-2" />
-          <span dir="rtl">הגדרת API</span>
-        </Button>
-      </div>
-
-      {showApiKeyInput && (
-        <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-          <Label htmlFor="api-key" dir="rtl">מפתח API של CloudConvert</Label>
-          <Input
-            id="api-key"
-            type="password"
-            placeholder="sk-..."
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            dir="ltr"
-          />
-          <div className="flex space-x-2">
-            <Button onClick={handleApiKeySave} size="sm">
-              <span dir="rtl">שמירה</span>
-            </Button>
-            <Button variant="ghost" onClick={() => setShowApiKeyInput(false)} size="sm">
-              <span dir="rtl">ביטול</span>
-            </Button>
-          </div>
-          <p className="text-xs text-gray-600" dir="rtl">
-            המפתח נשמר במחשב שלכם בלבד ולא נשלח לשרת
-          </p>
-        </div>
-      )}
-
       {!selectedFile ? (
         <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-purple-400 transition-colors">
           <input
