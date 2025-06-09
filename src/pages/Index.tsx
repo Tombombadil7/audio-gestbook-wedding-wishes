@@ -91,21 +91,21 @@ const Index = () => {
                   <span className="text-xl font-bold text-blue-600">1</span>
                 </div>
                 <h3 className="font-semibold text-gray-800" dir="rtl">צפו בהוראות</h3>
-                <p className="text-sm text-gray-600" dir="rtl">צפו בהוראות ההרכבה והורידו את קובץ ה-PDF</p>
+                <p className="text-sm text-gray-600" dir="rtl">בקובת ההוראות יש דף הוראות לאורחים שניתן להדפיס ולהציג והוראות לכם</p>
               </div>
               <div className="space-y-3">
                 <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto">
                   <span className="text-xl font-bold text-purple-600">2</span>
                 </div>
                 <h3 className="font-semibold text-gray-800" dir="rtl">המירו קבצי אודיו</h3>
-                <p className="text-sm text-gray-600" dir="rtl">העלו קבצי אודיו והמירו אותם לפורמט הנדרש</p>
+                <p className="text-sm text-gray-600" dir="rtl">באם תרצו לשנות את ההודעה שהאורחים שומעים בהתחלה, הקליטו בטלפון ולאחר מכן העלו לפה לקבלת הקובץ הסופי שיש להעביר ללוח</p>
               </div>
               <div className="space-y-3">
                 <div className="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center mx-auto">
                   <span className="text-xl font-bold text-rose-600">3</span>
                 </div>
-                <h3 className="font-semibold text-gray-800" dir="rtl">תהנו מהמתנה</h3>
-                <p className="text-sm text-gray-600" dir="rtl">הרכיבו את ספר האורחים האודיו ושמרו זכרונות</p>
+                <h3 className="font-semibold text-gray-800" dir="rtl">התחברו בכבל USB והורידו את הברכות</h3>
+                <p className="text-sm text-gray-600" dir="rtl">הורידו את הברכות הקוליות למחשב או לטלפון ושמרו זכרונות</p>
               </div>
             </div>
           </CardContent>
