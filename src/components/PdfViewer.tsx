@@ -44,7 +44,7 @@ const PdfViewer = () => {
         
         <div className="text-center mb-6">
           <h3 className="text-lg font-medium text-gray-800 mb-2" dir="rtl">
-            הוראות הרכבה מפורטות
+            הוראות שימוש מפורטות
           </h3>
           <p className="text-sm text-gray-600" dir="rtl">
             מדריך שלב אחר שלב לשימוש במתנה שלכם
