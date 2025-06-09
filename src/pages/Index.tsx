@@ -91,7 +91,7 @@ const Index = () => {
                   <span className="text-xl font-bold text-blue-600">1</span>
                 </div>
                 <h3 className="font-semibold text-gray-800" dir="rtl">צפו בהוראות</h3>
-                <p className="text-sm text-gray-600" dir="rtl">בקובת ההוראות יש דף הוראות לאורחים שניתן להדפיס ולהציג והוראות לכם</p>
+                <p className="text-sm text-gray-600" dir="rtl">בקובץ ההוראות יש דף הוראות לאורחים שניתן להדפיס ולהציג והוראות לכם</p>
               </div>
               <div className="space-y-3">
                 <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto">
