@@ -10,7 +10,7 @@ const PdfViewer = () => {
   // This would be your actual PDF file URL - you can host it in the public folder
   // or on a service like Google Drive, Dropbox, etc.
   const instructionFileUrl = "/instructions.pdf"; // Place your PDF in the public folder
-  const instructionFileName = "הוראות הרכבה - ספר אורחים אודיו.pdf";
+  const instructionFileName = "הוראות שימוש - ספר ברכות אודיו.pdf";
 
   const handleView = () => {
     window.open(instructionFileUrl, '_blank');
@@ -31,7 +31,7 @@ const PdfViewer = () => {
     
     toast({
       title: "הורדה החלה",
-      description: "הוראות ההרכבה מתחילות להתוריד",
+      description: "הוראות השימוש מתחילות לרדת",
     });
   };
 
@@ -47,7 +47,7 @@ const PdfViewer = () => {
             הוראות הרכבה מפורטות
           </h3>
           <p className="text-sm text-gray-600" dir="rtl">
-            מדריך שלב אחר שלב להרכבת ספר האורחים האודיו
+            מדריך שלב אחר שלב לשימוש במתנה שלכם
           </p>
         </div>
         
@@ -65,7 +65,7 @@ const PdfViewer = () => {
 
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
         <p className="text-sm text-blue-800" dir="rtl">
-          <strong>טיפ:</strong> הורידו את ההוראות למחשב שלכם לצפייה נוחה במהלך ההרכבה
+          <strong>טיפ:</strong> הורידו את ההוראות למחשב שלכם לצפייה נוחה 
         </p>
       </div>
     </div>
