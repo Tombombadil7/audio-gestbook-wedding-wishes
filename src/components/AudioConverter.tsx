@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Upload, Download, Music, Loader2, CheckCircle, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -77,18 +76,34 @@ const AudioConverter = () => {
       const job = await jobResponse.json();
       setProgress(10);
 
-      // Upload the file
+      // Upload the file with proper form parameters
       const importTask = job.data.tasks.find((t: any) => t.operation === 'import/upload');
+      const formParams = importTask.result.form.parameters;
+      
       const formData = new FormData();
-      formData.append('file', inputFile, fileName);
+      
+      // Add all the required AWS S3 parameters first
+      Object.keys(formParams).forEach(key => {
+        formData.append(key, formParams[key]);
+      });
+      
+      // Add the file last (this is important for S3 uploads)
+      formData.append('file', inputFile);
+
+      console.log('Uploading to:', importTask.result.form.url);
+      console.log('Form parameters:', formParams);
 
       const uploadResponse = await fetch(importTask.result.form.url, {
         method: 'POST',
         body: formData,
       });
 
+      console.log('Upload response status:', uploadResponse.status);
+      
       if (!uploadResponse.ok) {
-        throw new Error('Failed to upload file');
+        const errorText = await uploadResponse.text();
+        console.error('Upload error response:', errorText);
+        throw new Error(`Failed to upload file: ${uploadResponse.status}`);
       }
       setProgress(30);
 
@@ -106,9 +121,12 @@ const AudioConverter = () => {
 
         finishedJob = await statusResponse.json();
         
+        console.log(`Job status attempt ${attempts + 1}:`, finishedJob.data.status);
+        
         if (finishedJob.data.status === 'finished') {
           break;
         } else if (finishedJob.data.status === 'error') {
+          console.error('Job error:', finishedJob.data);
           throw new Error('Conversion failed');
         }
 
@@ -126,6 +144,8 @@ const AudioConverter = () => {
       // Get the export URL and download the file
       const exportTask = finishedJob.data.tasks.find((t: any) => t.operation === 'export/url');
       const downloadUrl = exportTask.result.files[0].url;
+
+      console.log('Downloading from:', downloadUrl);
 
       const downloadResponse = await fetch(downloadUrl);
       if (!downloadResponse.ok) throw new Error('Failed to download converted file');
