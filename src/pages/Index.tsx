@@ -121,7 +121,7 @@ const Index = () => {
             <Heart className="w-6 h-6 text-rose-500 fill-current" />
           </div>
           <p className="text-sm text-gray-500" dir="rtl">
-            ספר אורחים אודיו דיגיטלי - מתנת חתונה מיוחדת
+            מהגיס/אח החנון האוהב שלכם, מאחל לכם הרבה שנים של אודר והרפתקאות!!
           </p>
         </div>
       </footer>
