@@ -32,7 +32,7 @@ const AudioConverter = () => {
 
   // Browser-compatible version of your CloudConvert function
   const convertAudioTo44kHzWav = async (inputFile: File, fileName: string): Promise<Blob | null> => {
-    if (!CLOUDCONVERT_API_KEY || CLOUDCONVERT_API_KEY === 'YOUR_API_KEY_HERE') {
+    if (!CLOUDCONVERT_API_KEY || CLOUDCONVERT_API_KEY.includes('YOUR_API_KEY_HERE')) {
       toast({
         title: "חסר מפתח API",
         description: "אנא הגדירו מפתח API של CloudConvert בקוד",
@@ -299,7 +299,7 @@ const AudioConverter = () => {
                 </div>
                 <Button onClick={handleDownload} className="w-full">
                   <Download className="w-4 h-4 mr-2" />
-                  <span dir="rtl">הורידו WAV 44.1kHz</span>
+                  <span dir="rtl">הורדו WAV 44.1kHz</span>
                 </Button>
               </div>
             ) : (
